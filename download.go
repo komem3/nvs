@@ -125,7 +125,7 @@ func Download(ctx context.Context, v *version) error {
 		return err
 	}
 
-	downloadFile := fmt.Sprintf("node-%s-%s-%s", path, runtime.GOOS, runtime.GOARCH)
+	downloadFile := fmt.Sprintf("node-%s-%s-%s", path, runtime.GOOS, strings.ReplaceAll(runtime.GOARCH, "amd", "x"))
 	url, err := url.JoinPath(nodejsURL, path, downloadFile+".tar.gz")
 	if err != nil {
 		return err
@@ -149,7 +149,7 @@ func Download(ctx context.Context, v *version) error {
 		return fmt.Errorf("remove %s: %w", targetPath, err)
 	}
 	if err := os.Rename(fromDir, targetPath); err != nil {
-		return fmt.Errorf("rename from %s to %s: %w", fromDir, targetPath, err)
+		return err
 	}
 
 	return nil
