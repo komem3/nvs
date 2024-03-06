@@ -31,3 +31,26 @@ you can use the global version with the following command.
 ```
 nvs install prettier
 ```
+
+## Usage
+
+```
+Usage:
+  nvs [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  download    Download specify version of Nodejs
+  help        Help about any command
+  init        Initialize nvs
+  install     install tools by global Node version
+  run         Run command(node, npm or npx)
+  use         Select Nodejs version
+  versions    List version
+
+Flags:
+      --debug   output debug log
+  -h, --help    help for nvs
+
+Use "nvs [command] --help" for more information about a command.
+```
