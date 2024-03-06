@@ -29,6 +29,10 @@ func debugf(ctx context.Context, format string, args ...any) {
 	}
 }
 
+func warnf(ctx context.Context, format string, args ...any) {
+	ctx.Value(loggerErrKey{}).(*log.Logger).Output(2, fmt.Sprintf(format, args...))
+}
+
 func fatal(ctx context.Context, err error) {
 	ctx.Value(loggerErrKey{}).(*log.Logger).Output(2, err.Error())
 	os.Exit(1)

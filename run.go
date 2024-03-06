@@ -116,11 +116,11 @@ func Run(ctx context.Context, versionStr string, command string, args []string) 
 			return err
 		}
 	} else {
-		v, err := decideVersion(ctx, baseDir)
+		versionStr, err = decideVersion(ctx, baseDir)
 		if err != nil {
 			return err
 		}
-		parsedVersion, err = parseVersionString(v)
+		parsedVersion, err = parseVersionString(versionStr)
 		if err != nil {
 			return err
 		}
@@ -128,7 +128,7 @@ func Run(ctx context.Context, versionStr string, command string, args []string) 
 	nodeBasePath, err := findLocalVersion(baseDir, parsedVersion)
 	if err != nil {
 		if errors.Is(err, ErrNotFoundLocalVersion) {
-			debugf(ctx, "download node")
+			warnf(ctx, "download %s version", versionStr)
 			if err := Download(ctx, parsedVersion); err != nil {
 				return err
 			}
