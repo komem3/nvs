@@ -114,7 +114,7 @@ func outputLocalVersions(ctx context.Context) error {
 	current, err := decideVersion(ctx, baseDir)
 	if err != nil {
 		if os.IsNotExist(err) {
-			infof(ctx, "local version is not found")
+			debugf(ctx, "local version is not found")
 		} else {
 			return err
 		}
@@ -127,7 +127,7 @@ func outputLocalVersions(ctx context.Context) error {
 	global, err := os.ReadFile(filepath.Join(baseDir, globalVersionFile))
 	if err != nil {
 		if os.IsNotExist(err) {
-			infof(ctx, "global version is not found")
+			debugf(ctx, "global version is not found")
 		} else {
 			return err
 		}

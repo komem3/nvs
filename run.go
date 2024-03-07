@@ -142,7 +142,10 @@ func Run(ctx context.Context, versionStr string, command string, args []string) 
 	}
 	debugf(ctx, "use %s", nodeBasePath)
 
-	cmd := exec.CommandContext(ctx, filepath.Join(baseDir, "versions", nodeBasePath, "bin", command), args...)
+	if command != "node" {
+		args = slices.Concat([]string{filepath.Join(baseDir, "versions", nodeBasePath, "bin", command)}, args)
+	}
+	cmd := exec.CommandContext(ctx, filepath.Join(baseDir, "versions", nodeBasePath, "bin", "node"), args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
