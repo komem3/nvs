@@ -14,7 +14,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"slices"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -287,31 +286,4 @@ func download(ctx context.Context, url string) (*os.File, error) {
 		return nil, err
 	}
 	return tmpFile, nil
-}
-
-func compareVersionString(numberStrs []string, v *version) (bool, error) {
-	if len(numberStrs) != 3 {
-		return false, fmt.Errorf("%v is invalid format", numberStrs)
-	}
-	major, err := strconv.ParseInt(numberStrs[0], 10, 64)
-	if err != nil {
-		return false, err
-	}
-	minor, err := strconv.ParseInt(numberStrs[1], 10, 64)
-	if err != nil {
-		return false, err
-	}
-	patch, err := strconv.ParseInt(numberStrs[2], 10, 64)
-	if err != nil {
-		return false, err
-	}
-	return compareVersion(int(major), v.major) && compareVersion(int(minor), v.minor) && compareVersion(int(patch), v.patch), nil
-}
-
-func mustParse(numberStr string) int {
-	num, err := strconv.ParseInt(numberStr, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-	return int(num)
 }
