@@ -68,6 +68,7 @@ func decideVersion(ctx context.Context, baseDir string) (string, error) {
 		}
 		return string(v), nil
 	}
+
 	for dir := "."; ; dir = filepath.Join("..", dir) {
 		directory, err := filepath.Abs(dir)
 		if err != nil {
@@ -93,8 +94,12 @@ func decideVersion(ctx context.Context, baseDir string) (string, error) {
 			if err := json.NewDecoder(packageFile).Decode(&packageJson); err != nil {
 				return "", err
 			}
-			if packageJson.Engines.Node != "" {
-				return packageJson.Engines.Node, nil
+			if node := packageJson.Engines.Node; node != "" {
+				if strings.HasPrefix(node, ">") {
+					continue
+				} else {
+					return packageJson.Engines.Node, nil
+				}
 			}
 		}
 		if directory == "/" {
