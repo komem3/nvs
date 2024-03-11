@@ -110,10 +110,6 @@ func findTarget(ctx context.Context, v *version) (string, error) {
 	return downloadpaths[0].path, nil
 }
 
-func calcPriority(splitVersion []string) int {
-	return mustParse(splitVersion[0])*10000 + mustParse(splitVersion[1])*100 + mustParse(splitVersion[2])
-}
-
 func Download(ctx context.Context, v *version) error {
 	base, err := checkInit()
 	if err != nil {
@@ -215,6 +211,11 @@ func download(ctx context.Context, url string) (*os.File, error) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		return nil, fmt.Errorf("response status is %d and body is '%s'", resp.StatusCode, body)
 	}
 
 	size := resp.ContentLength

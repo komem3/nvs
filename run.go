@@ -69,6 +69,10 @@ func decideVersion(ctx context.Context, baseDir string) (string, error) {
 		return string(v), nil
 	}
 
+	var (
+		priority       int
+		primaryVersion string
+	)
 	for dir := "."; ; dir = filepath.Join("..", dir) {
 		directory, err := filepath.Abs(dir)
 		if err != nil {
@@ -81,6 +85,14 @@ func decideVersion(ctx context.Context, baseDir string) (string, error) {
 			b, err := io.ReadAll(nodeVersionFile)
 			if err != nil {
 				return "", err
+			}
+			v := strings.TrimRight(string(b), "\n")
+			if priority > 0 {
+				curPriority := calcPriority(strings.Split(v, "."))
+				if curPriority > priority {
+					return v, nil
+				}
+				continue
 			}
 			return strings.TrimRight(string(b), "\n"), nil
 		}
@@ -96,14 +108,32 @@ func decideVersion(ctx context.Context, baseDir string) (string, error) {
 			}
 			if node := packageJson.Engines.Node; node != "" {
 				if strings.HasPrefix(node, ">") {
-					continue
+					splits := strings.Split(strings.TrimLeft(node, ">="), ".")
+					if len(splits) > 3 {
+						continue
+					}
+					curPriority := calcPriority(splits)
+					if curPriority > priority {
+						primaryVersion = node
+						priority = curPriority
+					}
 				} else {
-					return packageJson.Engines.Node, nil
+					return node, nil
 				}
 			}
 		}
 		if directory == "/" {
-			return globalVersion()
+			v, err := globalVersion()
+			if err != nil {
+				return "", err
+			}
+			if priority > 0 {
+				curPriority := calcPriority(strings.Split(v, "."))
+				if curPriority < priority {
+					return primaryVersion, nil
+				}
+			}
+			return v, nil
 		}
 	}
 }

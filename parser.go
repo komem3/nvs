@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -226,4 +227,12 @@ func mustParse(numberStr string) int {
 		panic(err)
 	}
 	return int(num)
+}
+
+func calcPriority(splitVersion []string) int {
+	var priority int
+	for i, verStr := range splitVersion {
+		priority += mustParse(verStr) * int(math.Pow(10, float64(3-i)))
+	}
+	return priority
 }
