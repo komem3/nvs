@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -106,7 +107,17 @@ func outputLocalVersions(ctx context.Context) error {
 		}
 		path, err := findLocalVersion(baseDir, parsedVersion)
 		if err != nil {
-			return "", err
+			if errors.Is(err, ErrNotFoundLocalVersion) {
+				if err := Download(ctx, parsedVersion); err != nil {
+					return "", err
+				}
+				path, err = findLocalVersion(baseDir, parsedVersion)
+				if err != nil {
+					return "", err
+				}
+			} else {
+				return "", err
+			}
 		}
 		return filepath.Base(path), nil
 	}
