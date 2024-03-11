@@ -82,7 +82,7 @@ func Initialize() error {
 }
 
 func createScript(dir, command string) error {
-	if err := os.WriteFile(filepath.Join(dir, "bin", command), []byte("#!/bin/bash\nnvs run "+command+" -- $@\n"), 0744); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "bin", command), []byte("#!/bin/bash\nnvs run "+command+" -- \"$@\"\n"), 0744); err != nil {
 		return err
 	}
 	return nil
