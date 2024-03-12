@@ -14,7 +14,7 @@ func main() {
 	ctx = context.WithValue(ctx, loggerErrKey{}, log.New(os.Stderr, "[nvs] ", 0))
 
 	rootCmd := &cobra.Command{Use: "nvs"}
-	rootCmd.Flags().BoolVar(&debug, "debug", false, "output debug log")
+	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "output debug log")
 
 	rootCmd.AddCommand(DownloadCmd)
 	rootCmd.AddCommand(InitCmd)
