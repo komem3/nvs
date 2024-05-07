@@ -121,14 +121,23 @@ func Download(ctx context.Context, v *version) error {
 	}
 
 	downloadFile := fmt.Sprintf("node-%s-%s-%s", path, runtime.GOOS, strings.ReplaceAll(runtime.GOARCH, "amd", "x"))
-	url, err := url.JoinPath(nodejsURL, path, downloadFile+".tar.gz")
-	if err != nil {
-		return err
-	}
-	infof(ctx, "download %s", url)
-	tmpFile, err := download(ctx, url)
-	if err != nil {
-		return err
+	var tmpFile *os.File
+	for {
+		u, err := url.JoinPath(nodejsURL, path, downloadFile+".tar.gz")
+		if err != nil {
+			return err
+		}
+		infof(ctx, "download %s", u)
+		tmpFile, err = download(ctx, u)
+		if err != nil {
+			if errors.Is(err, ErrNotFoundFile) && strings.Contains(downloadFile, "arm") {
+				infof(ctx, "%s is not found", u)
+				downloadFile = fmt.Sprintf("node-%s-%s-%s", path, runtime.GOOS, strings.ReplaceAll(runtime.GOARCH, "arm", "x"))
+				continue
+			}
+			return err
+		}
+		break
 	}
 
 	infof(ctx, "extract %s", tmpFile.Name())
@@ -202,6 +211,8 @@ func extract(file *os.File) (string, error) {
 	return dir, err
 }
 
+var ErrNotFoundFile = fmt.Errorf("not found file")
+
 func download(ctx context.Context, url string) (*os.File, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodHead, url, nil)
 	if err != nil {
@@ -213,6 +224,9 @@ func download(ctx context.Context, url string) (*os.File, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusNotFound {
+			return nil, ErrNotFoundFile
+		}
 		body, _ := io.ReadAll(resp.Body)
 		resp.Body.Close()
 		return nil, fmt.Errorf("response status is %d and body is '%s'", resp.StatusCode, body)

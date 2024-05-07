@@ -107,6 +107,9 @@ func decideVersion(ctx context.Context, baseDir string) (string, error) {
 				return "", err
 			}
 			if node := packageJson.Engines.Node; node != "" {
+				if strings.Contains(node, "||") {
+					node = strings.TrimSpace(strings.Split(node, "||")[0])
+				}
 				if strings.HasPrefix(node, ">") {
 					splits := strings.Split(strings.TrimLeft(node, ">="), ".")
 					if len(splits) > 3 {
