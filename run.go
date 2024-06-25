@@ -104,7 +104,7 @@ func decideVersion(ctx context.Context, baseDir string) (string, error) {
 				} `json:"engines"`
 			}
 			if err := json.NewDecoder(packageFile).Decode(&packageJson); err != nil {
-				return "", err
+				continue
 			}
 			if node := packageJson.Engines.Node; node != "" && !strings.ContainsAny(node, "|<>") {
 				return node, nil
