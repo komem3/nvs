@@ -106,23 +106,8 @@ func decideVersion(ctx context.Context, baseDir string) (string, error) {
 			if err := json.NewDecoder(packageFile).Decode(&packageJson); err != nil {
 				return "", err
 			}
-			if node := packageJson.Engines.Node; node != "" {
-				if strings.Contains(node, "||") {
-					node = strings.TrimSpace(strings.Split(node, "||")[0])
-				}
-				if strings.HasPrefix(node, ">") {
-					splits := strings.Split(strings.TrimLeft(node, ">="), ".")
-					if len(splits) > 3 {
-						continue
-					}
-					curPriority := calcPriority(splits)
-					if curPriority > priority {
-						primaryVersion = node
-						priority = curPriority
-					}
-				} else {
-					return node, nil
-				}
+			if node := packageJson.Engines.Node; node != "" && !strings.ContainsAny(node, "|<>") {
+				return node, nil
 			}
 		}
 		if directory == "/" {
